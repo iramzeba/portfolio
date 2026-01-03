@@ -1,0 +1,56 @@
+const redis = require('../config/redis')
+const crypto  = require("crypto")
+const logger = require("./logger.middleware")
+
+
+const cache = (ttlSeconds = 60) => {
+  return async (req, res, next) => {
+    // Cache only GET
+    if (req.method !== "GET") return next();
+
+    // Redis not ready → skip cache
+    if (!redis.isOpen) return next();
+
+    try {
+      const orgId = req.orgId || "public";
+
+      const queryHash = crypto
+        .createHash("md5")
+        .update(JSON.stringify(req.query))
+        .digest("hex");
+
+      const cacheKey = `cache:${orgId}:${req.method}:${req.originalUrl}:${queryHash}`;
+
+      // 🔍 Check cache
+      const cached = await redis.get(cacheKey);
+
+      if (cached) {
+        logger.info("Cache HIT", { cacheKey, orgId });
+        res.set("X-Cache", "HIT");
+        return res.json(JSON.parse(cached));
+      }
+
+      logger.info("Cache MISS", { cacheKey, orgId });
+
+      // 🎯 Hook response
+      const originalJson = res.json.bind(res);
+
+      res.json = (body) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          redis.setEx(cacheKey, ttlSeconds, JSON.stringify(body));
+          logger.debug("Cache SET", { cacheKey, ttlSeconds });
+        }
+
+        res.set("X-Cache", "MISS");
+        return originalJson(body);
+      };
+
+      next();
+    } catch (err) {
+      logger.error("Cache middleware error", err);
+      next(); // fail-open
+    }
+  };
+};
+
+module.exports = cache;
