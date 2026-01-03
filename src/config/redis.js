@@ -1,15 +1,26 @@
 const { createClient } = require("redis");
 const logger = require("../middlewares/logger.middleware");
 
-const redis = createClient({
-  url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
-});
+let redis = null;
 
-redis.on("connect", () => logger.info("Redis connected"));
-redis.on("error", (err) => logger.error("Redis error", err));
+const redisUrl = process.env.REDIS_URL;
 
-(async () => {
-  await redis.connect();
-})();
+// Only connect if a REAL Redis URL exists
+if (redisUrl && redisUrl.startsWith("redis://")) {
+  redis = createClient({ url: redisUrl });
+
+  redis.on("connect", () => logger.info("Redis connected"));
+  redis.on("error", (err) => logger.error("Redis error", err.message));
+
+  (async () => {
+    try {
+      await redis.connect();
+    } catch (err) {
+      logger.error("Redis connection failed", err.message);
+    }
+  })();
+} else {
+  logger.warn("Redis disabled (REDIS_URL not set or invalid)");
+}
 
 module.exports = redis;
