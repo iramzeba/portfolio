@@ -4,9 +4,12 @@ const logger = require("../middlewares/logger.middleware");
 let redis = null;
 
 async function connectRedis() {
+  console.log("connectRedis() invoked");
   const redisUrl = process.env.REDIS_URL;
+  console.log("Redis URL inside redis.js:", redisUrl);
 
   if (!redisUrl || !redisUrl.startsWith("redis://")) {
+    console.warn("REDIS_URL missing — Redis disabled");
     logger.warn("Redis disabled (REDIS_URL not set or invalid)");
     return null;
   }
