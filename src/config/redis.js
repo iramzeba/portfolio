@@ -19,11 +19,9 @@ async function connectRedis() {
   redis.on("connect", () => logger.info("Redis connected"));
   redis.on("error", (err) => logger.error("Redis error", err.message));
 
-  try {
-    await redis.connect();
-  } catch (err) {
-    logger.error("Redis connection failed", err.message);
-  }
+ redis.connect()
+    .then(() => logger.info("Redis connection established"))
+    .catch((err) => logger.error("Redis connection failed", err.message));
 
   return redis;
 }

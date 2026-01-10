@@ -19,7 +19,7 @@ app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
  console.log("Calling connectRedis...");
   // 🔥 Redis connects AFTER server starts
-  await connectRedis();
+   connectRedis();
   console.log("connectRedis() finished");
 
 });
