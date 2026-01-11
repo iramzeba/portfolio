@@ -21,7 +21,7 @@ const app = express();
    CORS + SECURITY
 ========================= */
 app.use(cors({
-  origin: ["http://localhost:3002", "https://yourfrontend.com"],
+  origin: ["http://localhost:3002", "https://portfolio-production-8f70.up.railway.app"],
   credentials: true
 }));
 app.use(helmet());
