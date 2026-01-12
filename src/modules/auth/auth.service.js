@@ -3,9 +3,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const RefreshToken = require('./refreshToken.model');
 const {signAccessToken,signRefreshToken} = require('../../utils/jwt')
-exports.register = async (email, password) => {
+
+
+exports.register = async (email, password,role) => {
   const hashed = await bcrypt.hash(password, 10);
-  const user = new User({ email, password: hashed });
+  const user = new User({ email, password: hashed,role });
   await user.save();
   return user;
 };

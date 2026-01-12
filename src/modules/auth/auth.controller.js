@@ -7,7 +7,7 @@ const {signAccessToken,signRefreshToken} = require('../../utils/jwt')
 exports.register = async (req, res) => {
   try {
   
-    const user = await authService.register(req.body.email, req.body.password);
+    const user = await authService.register(req.body.email, req.body.password,req.body.role);
     res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -27,13 +27,15 @@ exports.login = async (req, res) => {
      const accessToken = signAccessToken({
     userId: user._id,
     orgId: user.orgId,
-    type: "access"  
+    type: "access" ,
+    role:user.role 
   });
 
   const refreshToken = signRefreshToken({
     userId: user._id,
     orgId: user.orgId,
-     type: "refresh" 
+     type: "refresh" ,
+     role:user.role 
   });
 
   await RefreshToken.create({
@@ -49,7 +51,7 @@ exports.login = async (req, res) => {
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 
-  res.json({ accessToken });
+  res.json({ accessToken,userId:user._id,role:user.role });
 
   } catch (err) {
     res.status(401).json({ error: err.message });
