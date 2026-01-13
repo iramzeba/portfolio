@@ -1,4 +1,4 @@
-const redis = require('../config/redis')
+const {redis} = require('../config/redis')
 const crypto  = require("crypto")
 const logger = require("./logger.middleware")
 
