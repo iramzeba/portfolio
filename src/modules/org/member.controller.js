@@ -10,7 +10,7 @@ exports.addMember = async (req, res) => {
 
   const { email, role } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).lean();
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
@@ -30,15 +30,15 @@ exports.addMember = async (req, res) => {
     role: role || "member"
   });
 
-  await syncSeats(req.orgId)
+ // await syncSeats(req.orgId)
 
   res.status(201).json(member);
 };
 
 // ADMIN + MEMBER – list org members
 exports.listMembers = async (req, res) => {
-  const members = await Member.find({ orgId: req.orgId })
-    .populate("userId", "email");
+  const members = await Member.find({ orgId: req.orgId }).select("userId")
+    .populate("userId", "email").lean();
 
   res.json(members);
 };
