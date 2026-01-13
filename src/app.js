@@ -17,6 +17,8 @@ const errHandler = require("./middlewares/error.middleware");
 
 const app = express();
 
+
+app.get("/health", (req, res) => res.json({ status: "OK" }));
 /* =========================
    CORS + SECURITY
 ========================= */
@@ -55,7 +57,6 @@ app.use(
 );
 
 
-app.get("/health", (req, res) => res.json({ status: "OK" }));
 /* =========================
    ROUTES
 ========================= */
