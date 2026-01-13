@@ -25,7 +25,8 @@ const cache = (ttlSeconds = 60) => {
         .update(JSON.stringify(req.query))
         .digest("hex");
 
-      const cacheKey = `cache:${orgId}:${req.method}:${req.originalUrl}:${queryHash}`;
+      //const cacheKey = `cache:${orgId}:${req.method}:${req.originalUrl}:${queryHash}`;
+     const cacheKey = `cache:orgs:${req.user.id}`;
 
       // 🔍 Check cache
       console.time("cache get");
