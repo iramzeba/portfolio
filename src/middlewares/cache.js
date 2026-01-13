@@ -12,6 +12,7 @@ const cache = (ttlSeconds = 60) => {
     if (!redis.isOpen) return next();
 
     try {
+      console.time("total request");
       const orgId = req.orgId || "public";
 
       const queryHash = crypto
@@ -22,14 +23,19 @@ const cache = (ttlSeconds = 60) => {
       const cacheKey = `cache:${orgId}:${req.method}:${req.originalUrl}:${queryHash}`;
 
       // 🔍 Check cache
+      console.time("cache get");
       const cached = await redis.get(cacheKey);
-
+       console.timeEnd("cache get");
       if (cached) {
+         console.log("CACHE HIT");
         logger.info("Cache HIT", { cacheKey, orgId });
+        console.timeEnd("total request");
         res.set("X-Cache", "HIT");
         return res.json(JSON.parse(cached));
       }
+console.log("CACHE MISS");
 
+console.time("db query");
       logger.info("Cache MISS", { cacheKey, orgId });
 
       // 🎯 Hook response
