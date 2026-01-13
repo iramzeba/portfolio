@@ -44,7 +44,7 @@ const userId = new mongoose.Types.ObjectId(req.user.id);
         }
 
       ]).allowDiskUse(true);
-      console.log(JSON.stringify(orgs, null, 2));
+    
 
        res.json(orgs)
     }catch(err){

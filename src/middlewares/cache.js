@@ -4,12 +4,17 @@ const logger = require("./logger.middleware")
 
 
 const cache = (ttlSeconds = 60) => {
+ 
   return async (req, res, next) => {
+      console.log("Cache middleware invoked for:", req.originalUrl);
     // Cache only GET
     if (req.method !== "GET") return next();
 
     // Redis not ready → skip cache
-    if (!redis.isOpen) return next();
+  if (!redis.isOpen) {
+    console.log("Redis not ready, skipping cache");
+    return next();
+  }
 
     try {
       console.time("total request");
@@ -32,7 +37,7 @@ const cache = (ttlSeconds = 60) => {
         console.timeEnd("total request");
         res.set("X-Cache", "HIT");
         return res.json(JSON.parse(cached));
-      }
+      } 
 console.log("CACHE MISS");
 
 console.time("db query");
@@ -53,6 +58,7 @@ console.time("db query");
 
       next();
     } catch (err) {
+       console.error("Cache middleware error", err);
       logger.error("Cache middleware error", err);
       next(); // fail-open
     }
