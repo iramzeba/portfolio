@@ -53,6 +53,9 @@ app.use(
     maxRequests: 1000, // per IP
   })
 );
+
+
+app.get("/health", (req, res) => res.json({ status: "OK" }));
 /* =========================
    ROUTES
 ========================= */
@@ -72,7 +75,6 @@ app.get("/", (req, res) => {
   res.send("Multi-Tenant SaaS Backend Running");
 });
 
-app.get("/health", (req, res) => res.json({ status: "OK" }));
 
 /* =========================
    ❗ ERROR HANDLER (LAST)
