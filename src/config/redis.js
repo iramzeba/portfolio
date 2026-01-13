@@ -1,29 +1,32 @@
 const { createClient } = require("redis");
 const logger = require("../middlewares/logger.middleware");
 
-let redis = null;
+const redisUrl = process.env.REDIS_URL;
 
-async function connectRedis() {
-  console.log("connectRedis() invoked");
-  const redisUrl = process.env.REDIS_URL;
-  console.log("Redis URL inside redis.js:", redisUrl);
+let redis;
 
-  if (!redisUrl || !redisUrl.startsWith("redis://")) {
-    console.warn("REDIS_URL missing — Redis disabled");
-    logger.warn("Redis disabled (REDIS_URL not set or invalid)");
-    return null;
-  }
-
+if (redisUrl && redisUrl.startsWith("redis://")) {
   redis = createClient({ url: redisUrl });
 
-  redis.on("connect", () => logger.info("Redis connected"));
-  redis.on("error", (err) => logger.error("Redis error", err.message));
+  redis.on("connect", () => logger.info("🔌 Redis connecting..."));
+  redis.on("ready", () => logger.info("✅ Redis ready"));
+  redis.on("error", (err) => logger.error("❌ Redis error", err.message));
+} else {
+  logger.warn("⚠️ REDIS_URL missing — Redis disabled");
+}
 
- redis.connect()
-    .then(() => logger.info("Redis connection established"))
-    .catch((err) => logger.error("Redis connection failed", err.message));
+async function connectRedis() {
+  if (!redis) return null;
+
+  if (!redis.isOpen) {
+    await redis.connect();
+    logger.info("🚀 Redis connection established");
+  }
 
   return redis;
 }
 
-module.exports = { connectRedis };
+module.exports = {
+  redis,
+  connectRedis,
+};

@@ -15,11 +15,26 @@ connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
- console.log("Calling connectRedis...");
-  // 🔥 Redis connects AFTER server starts
-   connectRedis();
-  console.log("connectRedis() finished");
+// app.listen(PORT, async () => {
+//   console.log(`Server running on port ${PORT}`);
+//  console.log("Calling connectRedis...");
+//   // 🔥 Redis connects AFTER server starts
+//    connectRedis();
+//   console.log("connectRedis() finished");
 
-});
+// });
+
+(async () => {
+  try {
+    console.log("Connecting Redis...");
+    await connectRedis(); // ✅ WAIT for Redis
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+})();
