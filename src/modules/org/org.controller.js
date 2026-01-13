@@ -25,7 +25,7 @@ exports.listOrgs = async (req,res)=>{
         {$match:{userId:req.user.id}},
         {
           $lookup:{
-            from:'Organization',
+            from:'organizations',
             localField:'orgId',
             foreignField:'_id',
             as :'org'
@@ -41,7 +41,7 @@ exports.listOrgs = async (req,res)=>{
           }
         }
 
-      ])
+      ]).allowDiskUse(true);
        res.json(orgs)
     }catch(err){
       res.status(500).json({
