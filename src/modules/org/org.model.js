@@ -11,4 +11,7 @@ const orgSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+
+orgSchema.index({owner:1})
+
 module.exports=mongoose.model("Organization",orgSchema)
