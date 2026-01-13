@@ -16,7 +16,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-     const user = await User.findOne({ email:req.body.email });
+     const user = await User.findOne({ email:req.body.email }).lean();
   if (!user) throw new Error("Invalid credentials");
 
   const match = await bcrypt.compare( req.body.password,user.password);
@@ -70,7 +70,7 @@ exports.refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.status(401).json({ message: "No refresh token" });
 
-  const stored = await RefreshToken.findOne({ token });
+  const stored = await RefreshToken.findOne({ token }).lean();
   if (!stored) return res.status(403).json({ message: "Invalid refresh token" });
 
   let payload;

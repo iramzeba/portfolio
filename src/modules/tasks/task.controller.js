@@ -23,7 +23,7 @@ exports.getTasks = async (req, res) => {
   const tasks = await Task.find({
     projectId: req.params.projectId,
     orgId: req.orgId
-  });
+  },{title:1,description:1,status:1}).lean();
 
   res.json(tasks);
 };

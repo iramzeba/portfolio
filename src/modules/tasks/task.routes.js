@@ -8,8 +8,10 @@ const {
   deleteTask
 } = require("./task.controller");
 
+const cache = require("../../middlewares/cache")
+
 router.post("/", auth, tenant, createTask);
-router.get("/:projectId", auth, tenant, getTasks);
+router.get("/:projectId", auth, tenant,cache(120), getTasks);
 router.patch("/:id/status", auth, tenant, updateTaskStatus);
 router.delete("/:id", auth, tenant, deleteTask);
 

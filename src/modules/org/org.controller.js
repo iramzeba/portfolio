@@ -21,11 +21,27 @@ exports.createOrg = async(req,res)=>{
 
 exports.listOrgs = async (req,res)=>{
     try{
-       const memberShip = await Member.find({userId:req.user.id}).populate("orgId")
-       const orgs = memberShip.map(m=>m.orgId);
+      const orgs = await Member.aggregate([
+        {$match:{userId:req.user.id}},
+        {
+          $lookup:{
+            from:'Organization',
+            localField:'orgId',
+            foreignField:'_id',
+            as :'org'
+          }
+        },{
+              $unwind:'$org'
+        },
+        {
+          $project:{
+            _id:'$org._id',
+            name:'$org.name'
 
-     
+          }
+        }
 
+      ])
        res.json(orgs)
     }catch(err){
       res.status(500).json({

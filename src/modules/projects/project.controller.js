@@ -27,8 +27,8 @@ await logAudit({
 }
 
 exports.getProject = async(req,res)=>{
-    console.log(req.user,'ree')
-const projects = await Project.find({orgId:req.orgId})
+
+const projects = await Project.find({orgId:req.orgId},{name:1,description:1}).lean()
 res.json(projects)
 
 }

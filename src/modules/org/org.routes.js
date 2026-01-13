@@ -6,7 +6,15 @@ const cache = require("../../middlewares/cache")
 
 
 router.post("/",authMiddleware, createOrg)
-router.get("/",authMiddleware, rateLimit({ windowSeconds: 60, maxRequests: 10 }),cache(120),listOrgs)
+
+
+ router.get(
+  "/",
+  authMiddleware,   // decode token, no DB
+  cache(120),      // user-scoped
+rateLimit({ windowSeconds: 60, maxRequests: 10 }),
+  listOrgs
+);
 
 
 module.exports = router;

@@ -22,17 +22,27 @@ app.get("/health", (req, res) => res.json({ status: "OK" }));
 /* =========================
    CORS + SECURITY
 ========================= */
-app.use(cors({
-  origin: ["http://localhost:3002", "https://portfolio-production-8f70.up.railway.app"],
-  credentials: true
-}));
-app.use(helmet());
+// app.use(cors({
+//   origin: ["http://localhost:3002", "https://portfolio-production-8f70.up.railway.app"],
+//   credentials: true
+// }));
+
+const apiMiddlewares = [
+  cors({
+    origin: ["http://localhost:3002", "https://portfolio-production-8f70.up.railway.app"],
+    credentials: true
+  }),
+  helmet(),
+  cookieParser(),
+  rateLimit({ windowSeconds: 60, maxRequests: 1000 })
+];
+// app.use(helmet());
 
 /* =========================
    🚨 STRIPE WEBHOOK (RAW)
    MUST COME BEFORE JSON
 ========================= */
-app.use("/billing", webhookRoutes);
+app.use("/billing",apiMiddlewares, webhookRoutes);
 
 /* =========================
    JSON PARSER (NORMAL APIs)
@@ -46,27 +56,27 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-app.use(cookieParser());
+// app.use(cookieParser());
 app.disable("x-powered-by")
 app.set("trust proxy", 1)
-app.use(
-  rateLimit({
-    windowSeconds: 60,
-    maxRequests: 1000, // per IP
-  })
-);
+// app.use(
+//   rateLimit({
+//     windowSeconds: 60,
+//     maxRequests: 1000, // per IP
+//   })
+// );
 
 
 /* =========================
    ROUTES
 ========================= */
-app.use("/auth", authRoutes);
-app.use("/orgs", orgRoutes);
-app.use("/projects", projectRoutes);
-app.use("/members", memberRoutes);
-app.use("/tasks", taskRoutes);
-app.use("/invites", inviteRoutes);
-app.use("/billing", billingRoutes);
+app.use("/auth",apiMiddlewares, authRoutes);
+app.use("/orgs",apiMiddlewares, orgRoutes);
+app.use("/projects",apiMiddlewares, projectRoutes);
+app.use("/members",apiMiddlewares,memberRoutes);
+app.use("/tasks", apiMiddlewares,taskRoutes);
+app.use("/invites", apiMiddlewares,inviteRoutes);
+app.use("/billing", apiMiddlewares,billingRoutes);
 
 /* =========================
    HEALTH

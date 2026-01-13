@@ -8,7 +8,7 @@ exports.acceptInvite = async (req, res) => {
     token,
     accepted: false,
     expiresAt: { $gt: new Date() }
-  });
+  }).lean();
 
   if (!invite) {
     return res.status(400).json({ message: "Invalid or expired invite" });
