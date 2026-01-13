@@ -12,7 +12,7 @@ const memberSchema = new mongoose.Schema({
     }
 },{timestamp:true})
 
-
-memberSchema.index({orgId:1,userId:1})
+memberSchema.index({ userId: 1 });                 // for $match userId
+memberSchema.index({ userId: 1, orgId: 1 });       // for aggregation + joins
 
 module.exports = mongoose.model("Member",memberSchema) 

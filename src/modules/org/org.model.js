@@ -9,9 +9,9 @@ const orgSchema = new mongoose.Schema({
         ref:"User",
         required:true
     }
-},{timestamps:true})
+},{ timestamps:true })
 
 
 orgSchema.index({owner:1})
-orgSchema.index({ _id: 1 });
+
 module.exports=mongoose.model("Organization",orgSchema)
