@@ -1,16 +1,16 @@
 const Organization = require('./org.model');
 const Member = require('./member.model')
 const jwt = require("jsonwebtoken")
-
+const mongoose = require("mongoose");
 exports.createOrg = async(req,res)=>{
     try{
-    const {name} = req.body;
+    const {name,role} = req.body;
     console.log(req,'req')
     const org = await Organization.create({
         name,owner:req.user.id
     });
     await Member.create({
-        userId:req.user.id,orgId:org._id,role:"admin"
+        userId:req.user.id,orgId:org._id,role
     })
     res.status(201).json(org);
 
@@ -21,8 +21,10 @@ exports.createOrg = async(req,res)=>{
 
 exports.listOrgs = async (req,res)=>{
     try{
+
+const userId = new mongoose.Types.ObjectId(req.user.id);
       const orgs = await Member.aggregate([
-        {$match:{userId:req.user.id}},
+        {$match:{userId}},
         {
           $lookup:{
             from:'organizations',
@@ -42,6 +44,8 @@ exports.listOrgs = async (req,res)=>{
         }
 
       ]).allowDiskUse(true);
+      console.log(JSON.stringify(orgs, null, 2));
+
        res.json(orgs)
     }catch(err){
       res.status(500).json({
